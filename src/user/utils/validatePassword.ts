@@ -26,6 +26,6 @@ export function validatePassword(password: string) {
   }
 
   if (messages.length > 1) {
-    throw new HttpException(messages.join('\n'), 401);
+    throw new HttpException(messages.join('. '), 401);
   }
 }

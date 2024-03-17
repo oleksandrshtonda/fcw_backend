@@ -9,14 +9,12 @@ import { User } from '@/user/user.entity';
 import { Repository } from 'typeorm';
 import { CreateUserDto } from '@/user/dto/create-user.dto';
 import { LoginUserDto } from '@/user/dto/login-user.dto';
-import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
 export class UserService {
   constructor(
     @InjectRepository(User)
     private userRepository: Repository<User>,
-    private jwtService: JwtService,
   ) {}
 
   async findAll(): Promise<User[]> {
@@ -31,30 +29,8 @@ export class UserService {
     return this.userRepository.findOneBy({ email });
   }
 
-  async create(user: CreateUserDto): Promise<User> {
-    const userExists = await this.findOneByEmail(user.email);
-
-    if (userExists) {
-      throw new HttpException('This user already exists', 409);
-    }
-
-    if (user.password !== user.repeatPassword) {
-      throw new HttpException(
-        'Bad request. user.password !== user.repeatPassword',
-        401,
-      );
-    }
-
-    const calculatedSalt = Math.trunc(Math.random() * 10);
-    const randomSalt = calculatedSalt > 4 ? calculatedSalt : 5;
-    const userDataForCreation = {
-      firstName: user.firstName,
-      lastName: user.lastName,
-      email: user.email,
-      password: await bcrypt.hash(user.password, randomSalt),
-    };
-
-    const newUser = this.userRepository.create(userDataForCreation);
+  async create(user: Omit<CreateUserDto, 'repeatPassword'>) {
+    const newUser = this.userRepository.create(user);
     return this.userRepository.save(newUser);
   }
 

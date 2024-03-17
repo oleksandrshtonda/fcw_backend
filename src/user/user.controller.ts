@@ -6,7 +6,6 @@ import {
   HttpCode,
   HttpException,
   Param,
-  Patch,
   Post,
 } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -15,7 +14,6 @@ import { validateName } from '@/user/utils/validateName';
 import { validateSurname } from '@/user/utils/validateSurname';
 import { validateEmail } from '@/user/utils/validateEmail';
 import { validatePassword } from '@/user/utils/validatePassword';
-import { LoginUserDto } from '@/user/dto/login-user.dto';
 
 @Controller('/users')
 export class UserController {
@@ -31,7 +29,7 @@ export class UserController {
     return this.userService.findOneById(id);
   }
 
-  @Post()
+  @Post('/registration')
   @HttpCode(201)
   async registration(@Body() createUserData: CreateUserDto) {
     validateName(createUserData.firstName);
@@ -52,15 +50,8 @@ export class UserController {
     return createdUser;
   }
 
-  @Post()
-  async login(@Body() authUserData: LoginUserDto) {
-    validateEmail(authUserData.email);
-
-    return this.userService.login(authUserData);
-  }
-
-  @Patch('/:id')
-  async update(@Body() updateUserData: object, @Param('id') id: number) {}
+  // @Patch('/:id')
+  // async update(@Body() updateUserData: object, @Param('id') id: number) {}
 
   @Delete('/:id')
   @HttpCode(204)
