@@ -1,19 +1,5 @@
-import {
-  Body,
-  Controller,
-  Delete,
-  Get,
-  HttpCode,
-  HttpException,
-  Param,
-  Post,
-} from '@nestjs/common';
-import { CreateUserDto } from './dto/create-user.dto';
+import { Controller, Delete, Get, HttpCode, Param } from '@nestjs/common';
 import { UserService } from '@/user/user.service';
-import { validateName } from '@/user/utils/validateName';
-import { validateSurname } from '@/user/utils/validateSurname';
-import { validateEmail } from '@/user/utils/validateEmail';
-import { validatePassword } from '@/user/utils/validatePassword';
 
 @Controller('/users')
 export class UserController {
@@ -28,30 +14,6 @@ export class UserController {
   async getById(@Param('id') id: number) {
     return this.userService.findOneById(id);
   }
-
-  @Post('/registration')
-  @HttpCode(201)
-  async registration(@Body() createUserData: CreateUserDto) {
-    validateName(createUserData.firstName);
-    validateSurname(createUserData.lastName);
-    validateEmail(createUserData.email);
-    validatePassword(createUserData.password);
-    validatePassword(createUserData.repeatPassword);
-
-    if (createUserData.password !== createUserData.repeatPassword) {
-      throw new HttpException(
-        'Bad request. user.password != user.repeatRepeat',
-        401,
-      );
-    }
-
-    const createdUser = await this.userService.create(createUserData);
-
-    return createdUser;
-  }
-
-  // @Patch('/:id')
-  // async update(@Body() updateUserData: object, @Param('id') id: number) {}
 
   @Delete('/:id')
   @HttpCode(204)
